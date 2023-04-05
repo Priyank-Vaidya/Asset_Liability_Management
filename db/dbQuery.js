@@ -10,7 +10,7 @@ export default {
    * DB Query
    * @param {object} req
    * @param {object} res
-   * @returns {object} object
+   * @returns {object}
    */
   query(quertText, params) {
     return new Promise((resolve, reject) => {
