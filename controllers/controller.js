@@ -2,6 +2,10 @@
 require('dotenv').config();
 const Pool = require('pg').Pool
 
+Pool.on('connect', ()=>{
+    console.log("Connected to Database");
+})
+
 //Pool Configuration.
 const pool = new Pool({
     user: 'priyank',
@@ -39,6 +43,10 @@ const getUserbyID = async (req, res)=>{
             res.status(200).send("Data successfully fetched");
         }
     })   
+}
+
+module.exports = async(req, res)=>{
+    te
 }
 
 //End all the clients in the pool
