@@ -1,0 +1,43 @@
+version: '3'
+
+# Services: 
+  # db
+  # app
+  # psql-command
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - bridge
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - bridge
+
+  psql-command:
+    image: postgres:latest
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - bridge
+      
+networks:
+  bridge:
+    driver: bridge
