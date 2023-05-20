@@ -4,6 +4,7 @@ const app = express();
 require('dotenv').config();
 const cors = require('cors');
 const router = require('./routes/routes');
+const pool = require('./db/dbConnection')
 
 
 app.use(express.json());
@@ -22,3 +23,10 @@ catch(err){
     console.log("Error in listening to port");
 }
 
+//End all the clients from the pool
+process.on('SIGINT', () => {
+    pool.end(() => {
+      console.log('Database pool has ended');
+      process.exit(0);
+    });
+  });

@@ -55,7 +55,7 @@ const hashPassword = (password) =>{
     .then(hash=>{
         userHash=hash;
         console.log(`Hash Password: ${hash}`);
-        validateUser(hash);
+        if(validateUser(password,hash)){return true;}
     })
     .catch(err=>{
         res.send({err: err.message});
@@ -63,11 +63,12 @@ const hashPassword = (password) =>{
     
 }
 
-const validateUser=(hash)=>{
+const validateUser=(password,hash)=>{
     bcrypt
     .compare(password, hash)
     .then(res => {
-      console.log(res) // return true
+      console.log(res) 
+      return true
     })
     .catch(err => { console.error({err:err.message}) });
 }
