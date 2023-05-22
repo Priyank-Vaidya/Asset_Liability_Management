@@ -18,8 +18,6 @@ from sklearn.linear_model import LinearRegression
 from textblob import TextBlob
 import constants as ct
 from Tweet import Tweet
-import nltk
-nltk.download('punkt')
 
 # Ignore Warnings
 import warnings
@@ -53,6 +51,8 @@ def insertintotable():
         data = yf.download(quote, start=start, end=end)
         df = pd.DataFrame(data=data)
         df.to_csv(''+quote+'.csv')
+
+        # If the Data is empty, then we use Alpha_Vantage
         if(df.empty):
             ts = TimeSeries(key='N6A6QT6IBFJOPJ70',output_format='pandas')
             data, meta_data = ts.get_daily_adjusted(symbol='NSE:'+quote, outputsize='full')
@@ -127,3 +127,69 @@ def insertintotable():
             print("ARIMA RMSE:",error_arima)
             print("##############################################################################")
             return arima_pred, error_arima
+        
+# Recommending the Stock based upon the History
+
+    def recommending(df, global_polarity,today_stock,mean):
+        if today_stock.iloc[-1]['Close'] < mean:
+            if global_polarity > 0:
+                idea="RISE"
+                decision="BUY"
+                print()
+                print("##############################################################################")
+                print("According to the ML Predictions and Sentiment Analysis of Tweets, a",idea,"in",quote,"stock is expected => ",decision)
+            elif global_polarity <= 0:
+                idea="FALL"
+                decision="SELL"
+                print()
+                print("##############################################################################")
+                print("According to the ML Predictions and Sentiment Analysis of Tweets, a",idea,"in",quote,"stock is expected => ",decision)
+        else:
+            idea="FALL"
+            decision="SELL"
+            print()
+            print("##############################################################################")
+            print("According to the ML Predictions and Sentiment Analysis of Tweets, a",idea,"in",quote,"stock is expected => ",decision)
+        return idea, decision
+
+        
+    quote=nm
+    #Try-except to check if valid stock symbol
+    try:
+        get_historical(quote)
+    except:
+        return render_template('index.html',not_found=True)
+    else:
+        df = pd.read_csv(''+quote+'.csv')
+        print("##############################################################################")
+        print("Today's",quote,"Stock Data: ")
+        today_stock=df.iloc[-1:]
+        print(today_stock)
+        print("##############################################################################")
+        df = df.dropna()
+        code_list=[]
+        for i in range(0,len(df)):
+            code_list.append(quote)
+        df2=pd.DataFrame(code_list,columns=['Code'])
+        df2 = pd.concat([df2, df], axis=1)
+        df=df2
+
+
+        arima_pred, error_arima=ARIMA_ALGO(df)
+        lstm_pred, error_lstm=LSTM_ALGO(df)
+        df, lr_pred, forecast_set,mean,error_lr=LIN_REG_ALGO(df)
+        polarity,tw_list,tw_pol,pos,neg,neutral = retrieving_tweets_polarity(quote)
+        
+        idea, decision=recommending(df, polarity,today_stock,mean)
+        print()
+        print("Forecasted Prices for Next 7 days:")
+        print(forecast_set)
+        today_stock=today_stock.round(2)
+        return render_template('results.html',quote=quote,arima_pred=round(arima_pred,2),lstm_pred=round(lstm_pred,2),
+                               lr_pred=round(lr_pred,2),open_s=today_stock['Open'].to_string(index=False),
+                               close_s=today_stock['Close'].to_string(index=False),adj_close=today_stock['Adj Close'].to_string(index=False),
+                               tw_list=tw_list,tw_pol=tw_pol,idea=idea,decision=decision,high_s=today_stock['High'].to_string(index=False),
+                               low_s=today_stock['Low'].to_string(index=False),vol=today_stock['Volume'].to_string(index=False),
+                               forecast_set=forecast_set,error_lr=round(error_lr,2),error_lstm=round(error_lstm,2),error_arima=round(error_arima,2))
+if __name__ == '__main__':
+   app.run()
