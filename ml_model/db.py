@@ -9,13 +9,13 @@ db_connection_name = os.environ.get('CLOUD_SQL_CONNECTION_NAME')
 
 
 
-unix_socket = '/cloudsql/{}'.format(db_connection_name)
+unix_socket = '/cloudsql/{}'.format('turing-micron-387618:asia-south1:flaskbackend')
 try:
         if os.environ.get('GAE_ENV') == 'standard':
-            conn = pymysql.connect(user=db_user,
-                                   password=db_password,
+            conn = pymysql.connect(user='priyank',
+                                   password=12345,
                                    unix_socket=unix_socket,
-                                   db=db_name,
+                                   db='gfg',
                                    cursorclass=pymysql.cursors.DictCursor
                                    )
             print("Connection Successfully Established")
