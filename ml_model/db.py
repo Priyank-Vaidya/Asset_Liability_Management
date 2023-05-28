@@ -18,7 +18,10 @@ try:
                                    db=db_name,
                                    cursorclass=pymysql.cursors.DictCursor
                                    )
+            print("Connection Successfully Established")
+
 except pymysql.MySQLError as e:
     print(e)
+
     
 

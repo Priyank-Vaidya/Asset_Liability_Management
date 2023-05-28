@@ -19,7 +19,7 @@ from sklearn.metrics import mean_squared_error
 # %matplotlib inline
 from flask import Flask, request, jsonify
 import os
-from db import conn
+# from db import conn
 
 # Connect to the database
 
@@ -126,11 +126,11 @@ def compute_model(df):
   return forecast_df.index[-1]
 
 
-def create(prediction):
-    with conn.cursor() as cursor:
-        cursor.execute('INSERT INTO PREDICTIONS (STOCK, PRED_PRICE) VALUES($s, $s)', prediction['stock'], prediction['pred_price'])
-    conn.commit()
-    conn.close()
+# def create(prediction):
+#     with conn.cursor() as cursor:
+#         cursor.execute('INSERT INTO PREDICTIONS (STOCK, PRED_PRICE) VALUES($s, $s)', prediction['stock'], prediction['pred_price'])
+#     conn.commit()
+#     conn.close()
 
 
 app = Flask(__name__)
@@ -162,7 +162,7 @@ def predict(stock):
    print("Saving the Predicted Price in the Database")
 
    prediction = pd.DataFrame({'stock_name': [stock], 'prediction': [pred_price]})
-   create(prediction=prediction)
+  #  create(prediction=prediction)
 
 
 
