@@ -53,7 +53,7 @@ ENV GOOGLE_CLOUD_SQL_HOST ${GOOGLE_CLOUD_SQL_HOST}
 ENV GOOGLE_CLOUD_SQL_PORT ${GOOGLE_CLOUD_SQL_PORT}
 
 # -----------------------------------------------------------------------
-
+#Running the Flask Application for storing the resulted value in the CloudSQL Engine
 RUN python3 db.py
 
 CMD ["python3", "stock_market_prediction.py"]
